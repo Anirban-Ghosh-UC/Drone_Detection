@@ -1,0 +1,36 @@
+sudo: required
+language: python
+dist: xenial
+cache: pip
+python:
+- '3.6'
+- '3.7'
+install:
+- pip install --upgrade pip
+- pip install --progress-bar off .[tensorflow-cpu]
+- pip install flake8==3.7.7
+- pip install pytest
+- pip install coverage codecov
+script:
+- flake8 texar/ examples/
+- coverage run -m pytest
+after_success:
+- codecov
+- "./scripts/travis_after_success.sh"
+jobs:
+  include:
+  - stage: docs
+    python: '3.7'
+    install:
+    - pip install --upgrade pip
+    - sudo apt-get install libenchant1c2a myspell-en-us
+    - pip install --progress-bar off -r docs/requirements.txt
+    script:
+    - cd docs
+    - sphinx-build -W -b html -d _build/doctrees . _build/html
+    - sphinx-build -b spelling -d _build/doctrees . _build/spelling
+notifications:
+  mail: false
+env:
+  matrix:
+    secure: RfbCJdFLIjWk2RewAWYxdANCysJvfKtd7NnhUSEhIfp1EUDgjS7qHc49EmHyXW6tkcjxTE4kJF3prb8hP1xGt5+Qs30gtOE2ZkRfYTo1aECzdYrdCYeqGr1iXhCPhh4qlYAAOvmQQc1cP3YVEj1kt6t0mDecAqhu8wVHkzTHRNXfYTCFVy38xEksx6sVukT5e6J0cw5M7FoxAGzhp/THLUQVyOum8//tI1VwaZ7oijKw6mynH01YLrCcWsMrz4DxBsrgc5I5GkrI8/WTWLwea7CreoxycboI8r5VTDIe2Rxau5xhbnhOVaJXpuzpS/N9OCppWnTadYy+kabtebrWCmZuG1nJ5tyoZFlcvY9PPUy9KihoFN87Ln4HrnFs9+WJa6j8MeGgDZyyIHM2DhDWD9m0Hsd0amk5/cRa1QoEhnNIXuj/ZdNqcvbSEFjPXnM/uc2RfJaYG1enjq0h3ntQUssqyGzJliOMzBrQ9WWvKVJCWTg1DUPkr6PSFStzbs2BTk+A3S/MyH/eRQf6T7ZxjJ4wCUS2WiDDGHBxKq5xjwnPCwa9BKw5qYRzolwlvobknb1eVO6vZvF/lfW02Y4oJzU8cgSYl+9JBhi+lv3+NhJzmeTdGzheLve6e0zjGhJwzPP7bHkzUId5wVAO9XmVaIecWntwXkX0pJhRxZa48hY=
